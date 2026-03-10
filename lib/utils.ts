@@ -1,24 +1,25 @@
 // ===== 製造Lot番号生成（確定版） =====
 // ア〜ヤ タ行抜き 31文字（日付1〜31に対応）
 export const LOT_KANA: string[] = [
-  'ア','イ','ウ','エ','オ',  // 1〜5
-  'カ','キ','ク','ケ','コ',  // 6〜10
-  'サ','シ','ス','セ','ソ',  // 11〜15
-  'ナ','ニ','ヌ','ネ','ノ',  // 16〜20  ← タ行なし
-  'ハ','ヒ','フ','ヘ','ホ',  // 21〜25
-  'マ','ミ','ム','メ','モ',  // 26〜30
+  'ア', 'イ', 'ウ', 'エ', 'オ',  // 1〜5
+  'カ', 'キ', 'ク', 'ケ', 'コ',  // 6〜10
+  'サ', 'シ', 'ス', 'セ', 'ソ',  // 11〜15
+  'ナ', 'ニ', 'ヌ', 'ネ', 'ノ',  // 16〜20  ← タ行なし
+  'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',  // 21〜25
+  'マ', 'ミ', 'ム', 'メ', 'モ',  // 26〜30
   'ヤ',                      // 31
 ]
 
 export function monthToAlpha(month: number): string {
   return String.fromCharCode('A'.charCodeAt(0) + month - 1)
 }
+
 export function yearToYY(year: number): string {
   return String(year).slice(-2)
 }
 
 /** 通常品: カナ(日付)+月英字+年2桁+製品ID  例: スB26SB
- *  seqInDay: 同日複数Lot時の連番（0始まり） */
+ * seqInDay: 同日複数Lot時の連番（0始まり） */
 export function generateNormalLotCode(date: Date, productId: string, seqInDay = 0): string {
   const kana = LOT_KANA[(date.getDate() - 1 + seqInDay) % LOT_KANA.length]
   return `${kana}${monthToAlpha(date.getMonth() + 1)}${yearToYY(date.getFullYear())}${productId}`
@@ -48,13 +49,13 @@ export function generateLotCode(params: {
 
   if (productId === 'MA' || productId.startsWith('MA-')) return generateComboLotCode(fy, 'MA', comboSeq)
   if (productId === 'FD' || productId.startsWith('FD-')) return generateComboLotCode(fy, 'FD', comboSeq)
-  if (productId === 'YC50' || productId === 'YO50')      return generateDdLotCode(date, productId)
+  if (productId === 'YC50' || productId === 'YO50') return generateDdLotCode(date, productId)
   return generateNormalLotCode(date, productId, seqInDay)
 }
 
 // ===== 賞味期限（製造日+5年6ヶ月） =====
 export function calcExpiryDate(productionDate: Date): Date {
-  const d = new Date(productionDate)
+  const d = new Date(productionDate.getTime()) // 元のオブジェクトを保護
   d.setFullYear(d.getFullYear() + 5)
   d.setMonth(d.getMonth() + 6)
   return d
@@ -66,29 +67,40 @@ export function calcProductionCounts(
   unitPerKg: number,
   unitPerCs: number
 ): { units: number; cs: number; piece: number } {
-  const units = Math.floor(productionKg * unitPerKg)
-  return { units, cs: Math.floor(units / unitPerCs), piece: units % unitPerCs }
+  const units = Math.round(productionKg * unitPerKg) // 浮動小数点誤差対策でroundを推奨
+  return {
+    units,
+    cs: Math.floor(units / unitPerCs),
+    piece: units % unitPerCs
+  }
 }
 
-// ===== ID採番 =====
+// ===== ID採番（構文エラー修正済み） =====
 export function generateOrderId(date: Date, seq: number): string {
-  return `ORD-${date.toISOString().slice(0,10).replace(/-/g,'')-}-${String(seq).padStart(3,'0')}`
+  // 不要なハイフンを削除し、ローカル時間を考慮したスライスを推奨
+  const dateStr = date.toLocaleDateString('ja-JP').replace(/\//g, '')
+  return `ORD-${dateStr}-${String(seq).padStart(3, '0')}`
 }
+
 export function generateArrivalId(date: Date, seq: number): string {
-  return `INC-${date.toISOString().slice(0,10).replace(/-/g,'')}-${String(seq).padStart(3,'0')}`
+  const dateStr = date.toLocaleDateString('ja-JP').replace(/\//g, '')
+  return `INC-${dateStr}-${String(seq).padStart(3, '0')}`
 }
 
 // ===== 在庫ステータス判定 =====
 export function getStockStatus(stock: number, safety: number): '充足' | '注意' | '不足' {
-  if (stock < safety)        return '不足'
-  if (stock < safety * 1.5)  return '注意'
+  if (stock < safety) return '不足'
+  if (stock < safety * 1.5) return '注意'
   return '充足'
 }
 
 // ===== 日付フォーマット =====
 export function fmtDate(d: string | Date): string {
-  return new Date(d).toLocaleDateString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit' })
+  if (!d) return '-'
+  return new Date(d).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
 }
+
 export function fmtDateTime(d: string | Date): string {
-  return new Date(d).toLocaleString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })
+  if (!d) return '-'
+  return new Date(d).toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
