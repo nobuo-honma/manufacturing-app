@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #1e40af;
+    --color-danger:  #dc2626;
+    --color-warn:    #d97706;
+    --color-ok:      #16a34a;
+  }
+}
+
+@media print {
+  aside { display: none !important; }
+  main  { padding: 0 !important; }
+  .no-print { display: none !important; }
+}
