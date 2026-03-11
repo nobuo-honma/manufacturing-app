@@ -2,12 +2,18 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Order, Product } from '@/lib/types'
+<<<<<<< HEAD
 import { generateLotCode, calcExpiryDate, calcProductionCounts } from '@/lib/utils'
 import { Plus, Trash2, CheckCircle } from 'lucide-react'
+=======
+import { generateLotCode, calcExpiryDate, calcProductionCounts, fmtDate } from '@/lib/utils'
+import { Plus, Trash2 } from 'lucide-react'
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
 
 const MAX_DAYS = 8
 
 interface DayPlan {
+<<<<<<< HEAD
   date: string; kg: number; units: number; cs: number
   piece: number; lot_code: string; expiry: string; notes: string
 }
@@ -17,6 +23,26 @@ interface Props {
   order: Order
   existingCs?: number
   comboSeqStart?: number
+=======
+  date: string
+  kg: number
+  units: number
+  cs: number
+  piece: number
+  lot_code: string
+  expiry: string
+  notes: string
+}
+
+const emptyDay = (): DayPlan => ({
+  date:'', kg:0, units:0, cs:0, piece:0, lot_code:'', expiry:'', notes:''
+})
+
+interface Props {
+  order: Order
+  existingCs?: number  // 既登録のc/s合計
+  comboSeqStart?: number  // MA/FDの連番開始値
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
 }
 
 export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStart = 1 }: Props) {
@@ -28,20 +54,40 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
   useEffect(() => {
     supabase.from('products').select('*').eq('id', order.product_id).single()
       .then(({ data }) => setProduct(data))
+<<<<<<< HEAD
     setDayPlans([emptyDay()])
     setSaved(false)
   }, [order.product_id, order.id])
+=======
+  }, [order.product_id])
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
 
   const update = (idx: number, field: Partial<DayPlan>) => {
     setDayPlans(prev => {
       const next = [...prev]
       next[idx] = { ...next[idx], ...field }
+<<<<<<< HEAD
       const d = next[idx]
       if (d.kg > 0 && d.date && product) {
         const { units, cs, piece } = calcProductionCounts(d.kg, product.unit_per_kg, product.unit_per_cs)
         const dt = new Date(d.date)
         const expiry   = calcExpiryDate(dt).toISOString().slice(0, 10)
         const lot_code = generateLotCode({ date: dt, productId: order.product_id, seqInDay: idx, comboSeq: comboSeqStart + idx })
+=======
+
+      // kg or date が変わったら自動計算
+      const d = next[idx]
+      if (d.kg > 0 && d.date && product) {
+        const { units, cs, piece } = calcProductionCounts(d.kg, product.unit_per_kg, product.unit_per_cs)
+        const dt    = new Date(d.date)
+        const expiry  = calcExpiryDate(dt).toISOString().slice(0, 10)
+        const lot_code = generateLotCode({
+          date: dt,
+          productId: order.product_id,
+          seqInDay: idx,
+          comboSeq: comboSeqStart + idx,
+        })
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
         next[idx] = { ...d, ...field, units, cs, piece, expiry, lot_code }
       }
       return next
@@ -69,12 +115,17 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
         notes:           day.notes || null,
       })
     }
+<<<<<<< HEAD
+=======
+    // 受注ステータスを製造中に更新
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
     await supabase.from('orders').update({ status: 'in_production' }).eq('id', order.id)
     setSaving(false)
     setSaved(true)
   }
 
   return (
+<<<<<<< HEAD
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
 
       {/* サマリバー */}
@@ -104,11 +155,36 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
         }}>
           <CheckCircle size={16} />
           製造計画を登録しました
+=======
+    <div className="space-y-5">
+      {/* サマリ */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 grid grid-cols-3 gap-4 text-sm">
+        <div>
+          <p className="text-xs text-gray-500">受注数</p>
+          <p className="font-bold text-gray-900">{order.quantity} c/s</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500">今回登録合計</p>
+          <p className="font-bold text-blue-700">{totalCs} c/s</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500">残り必要製造量</p>
+          <p className={`font-bold ${remainCs < 0 ? 'text-red-600' : remainCs === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+            {remainCs} c/s
+          </p>
+        </div>
+      </div>
+
+      {saved && (
+        <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm">
+          ✅ 製造計画を登録しました
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
         </div>
       )}
 
       {/* 日程入力 */}
       {dayPlans.map((day, idx) => (
+<<<<<<< HEAD
         <div key={idx} className="card-inner" style={{ padding: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)' }}>
@@ -119,11 +195,20 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px' }}
                 onMouseOver={e => (e.currentTarget.style.color = 'var(--danger)')}
                 onMouseOut={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+=======
+        <div key={idx} className="border border-gray-200 rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-gray-700">製造予定日 {idx + 1}日目</h4>
+            {dayPlans.length > 1 && (
+              <button onClick={() => setDayPlans(p => p.filter((_, i) => i !== idx))}
+                className="text-gray-400 hover:text-red-500">
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
                 <Trash2 size={15} />
               </button>
             )}
           </div>
 
+<<<<<<< HEAD
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="label">製造予定日</label>
@@ -133,11 +218,25 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="label">製造量（kg）</label>
               <input type="number" min="0" step="0.5" className="input"
+=======
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">製造予定日</label>
+              <input type="date" className="border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={day.date}
+                onChange={e => update(idx, { date: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">製造量（kg）</label>
+              <input type="number" min="0" step="0.5"
+                className="border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
                 value={day.kg || ''}
                 onChange={e => update(idx, { kg: Number(e.target.value) })} />
             </div>
           </div>
 
+<<<<<<< HEAD
           {/* 自動計算結果 */}
           {day.kg > 0 && day.date && (
             <div style={{
@@ -169,10 +268,29 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
             <label className="label">備考</label>
             <input type="text" placeholder="例: 50kg×4回" className="input"
               value={day.notes} onChange={e => update(idx, { notes: e.target.value })} />
+=======
+          {day.kg > 0 && day.date && (
+            <div className="bg-gray-50 rounded-lg p-3 grid grid-cols-5 gap-2 text-xs">
+              <div><span className="text-gray-500">個数</span><br /><strong>{day.units}</strong></div>
+              <div><span className="text-gray-500">c/s</span><br /><strong>{day.cs}</strong></div>
+              <div><span className="text-gray-500">端数(p)</span><br /><strong>{day.piece}</strong></div>
+              <div><span className="text-gray-500">賞味期限</span><br /><strong>{day.expiry}</strong></div>
+              <div><span className="text-gray-500">Lot番号</span><br /><strong className="font-mono">{day.lot_code}</strong></div>
+            </div>
+          )}
+
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">備考</label>
+            <input type="text" placeholder="例: 50kg×4回"
+              className="border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={day.notes}
+              onChange={e => update(idx, { notes: e.target.value })} />
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
           </div>
         </div>
       ))}
 
+<<<<<<< HEAD
       {/* 日程追加ボタン */}
       {dayPlans.length < MAX_DAYS && (
         <button onClick={() => setDayPlans(p => [...p, emptyDay()])}
@@ -186,13 +304,24 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
           onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
           onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(56,189,248,0.25)'; e.currentTarget.style.color = 'var(--text-muted)' }}>
           <Plus size={15} />
+=======
+      {dayPlans.length < MAX_DAYS && (
+        <button onClick={() => setDayPlans(p => [...p, emptyDay()])}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center gap-2">
+          <Plus size={16} />
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
           製造予定日を追加（最大{MAX_DAYS}日）
         </button>
       )}
 
+<<<<<<< HEAD
       {/* 登録ボタン */}
       <button onClick={handleSubmit} disabled={saving} className="btn-submit"
         style={{ width: '100%', marginTop: '4px' }}>
+=======
+      <button onClick={handleSubmit} disabled={saving}
+        className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50">
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
         {saving ? '登録中...' : '製造計画を登録する'}
       </button>
     </div>

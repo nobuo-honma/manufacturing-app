@@ -40,6 +40,7 @@ export function useProductStocks() {
   return { stocks, loading, refresh: fetch }
 }
 
+<<<<<<< HEAD
 // 在庫ページ用統合フック
 export function useInventory(tab: string) {
   const [itemStocks, setItemStocks]       = useState<ItemStock[]>([])
@@ -61,6 +62,8 @@ export function useInventory(tab: string) {
   return { itemStocks, productStocks, loading, refetch }
 }
 
+=======
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
 // アラート対象（安全在庫割れ）の品目を返す
 export function useStockAlerts() {
   const [alerts, setAlerts]   = useState<ItemStock[]>([])

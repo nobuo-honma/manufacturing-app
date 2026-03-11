@@ -16,6 +16,7 @@ const PAGE_TITLES: Record<string, string> = {
 
 export default function Header() {
   const pathname = usePathname()
+<<<<<<< HEAD
   const title = Object.entries(PAGE_TITLES)
     .find(([key]) => pathname === key || pathname.startsWith(key + '/'))?.[1] ?? ''
 
@@ -34,6 +35,16 @@ export default function Header() {
       <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
         {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
       </span>
+=======
+  const title = Object.entries(PAGE_TITLES).find(([key]) => pathname === key || pathname.startsWith(key + '/') )?.[1] ?? ''
+
+  return (
+    <header className="h-14 bg-white border-b flex items-center px-8">
+      <h1 className="text-base font-semibold text-gray-800">{title}</h1>
+      <div className="ml-auto text-sm text-gray-400">
+        {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+      </div>
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
     </header>
   )
 }

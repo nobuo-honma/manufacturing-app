@@ -20,6 +20,7 @@ const NAV = [
 export default function Sidebar() {
   const pathname = usePathname()
   return (
+<<<<<<< HEAD
     <aside style={{
       width: '220px',
       minHeight: '100vh',
@@ -74,11 +75,26 @@ export default function Sidebar() {
             onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)' } }}
             >
               <Icon size={16} style={{ opacity: active ? 1 : 0.7 }} />
+=======
+    <aside className="w-60 min-h-screen bg-gray-900 text-white flex flex-col shrink-0">
+      <div className="px-5 py-5 text-base font-bold border-b border-gray-700 leading-tight">
+        🍞 製造管理システム
+      </div>
+      <nav className="flex-1 p-3 space-y-0.5">
+        {NAV.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || (href !== '/' && pathname.startsWith(href))
+          return (
+            <Link key={href} href={href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                ${active ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
+              <Icon size={18} />
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
               {label}
             </Link>
           )
         })}
       </nav>
+<<<<<<< HEAD
 
       {/* フッター */}
       <div style={{
@@ -88,6 +104,10 @@ export default function Sidebar() {
         color: 'var(--text-muted)',
       }}>
         v1.0.0
+=======
+      <div className="p-4 text-xs text-gray-500 border-t border-gray-700">
+        DisasterBread v1.0
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
       </div>
     </aside>
   )

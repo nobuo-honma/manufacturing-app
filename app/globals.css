@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+<<<<<<< HEAD
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 @layer base {
@@ -343,4 +344,19 @@
   .no-print { display: none !important; }
   body    { background: white !important; color: black !important; }
   .card, .card-inner { background: white !important; border-color: #ddd !important; }
+=======
+@layer base {
+  :root {
+    --color-primary: #1e40af;
+    --color-danger:  #dc2626;
+    --color-warn:    #d97706;
+    --color-ok:      #16a34a;
+  }
+}
+
+@media print {
+  aside { display: none !important; }
+  main  { padding: 0 !important; }
+  .no-print { display: none !important; }
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
 }

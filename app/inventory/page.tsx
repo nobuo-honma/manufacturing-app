@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use client'
 import { useState } from 'react'
 import { useInventory } from '@/hooks/useInventory'
@@ -55,6 +56,15 @@ export default function InventoryPage() {
       {stocktakingTarget && (
         <StocktakingForm stock={stocktakingTarget} onClose={() => setStocktakingTarget(null)} onSaved={refetch} />
       )}
+=======
+import ItemStockTable from '@/components/inventory/ItemStockTable'
+
+export default function InventoryPage() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">在庫管理</h1>
+      <ItemStockTable />
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
     </div>
   )
 }

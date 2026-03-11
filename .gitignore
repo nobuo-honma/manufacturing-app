@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 node_modules/
 .next/
 out/
 build/
 .env*
 *.log
+=======
+node_modules
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0

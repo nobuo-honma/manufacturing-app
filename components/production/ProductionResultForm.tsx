@@ -70,19 +70,31 @@ export default function ProductionResultForm({ plan, onSaved }: Props) {
       <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-gray-500 mb-1">実績個数</label>
+<<<<<<< HEAD
           <input type="number" min="0" required className="input"
+=======
+          <input type="number" min="0" required className="border rounded-lg px-3 py-2 w-full text-sm"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.actual_units}
             onChange={e => setForm(p => ({ ...p, actual_units: Number(e.target.value) }))} />
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">実績c/s</label>
+<<<<<<< HEAD
           <input type="number" min="0" required className="input"
+=======
+          <input type="number" min="0" required className="border rounded-lg px-3 py-2 w-full text-sm"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.actual_cs}
             onChange={e => setForm(p => ({ ...p, actual_cs: Number(e.target.value) }))} />
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">端数(p)</label>
+<<<<<<< HEAD
           <input type="number" min="0" className="input"
+=======
+          <input type="number" min="0" className="border rounded-lg px-3 py-2 w-full text-sm"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.actual_piece}
             onChange={e => setForm(p => ({ ...p, actual_piece: Number(e.target.value) }))} />
         </div>
@@ -90,7 +102,11 @@ export default function ProductionResultForm({ plan, onSaved }: Props) {
 
       <div>
         <label className="block text-xs text-gray-500 mb-1">備考</label>
+<<<<<<< HEAD
         <input type="text" className="input"
+=======
+        <input type="text" className="border rounded-lg px-3 py-2 w-full text-sm"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
           value={form.notes}
           onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
       </div>

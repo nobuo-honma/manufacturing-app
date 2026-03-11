@@ -83,7 +83,11 @@ export default function OrderForm() {
         {/* 希望出荷日 */}
         <div>
           <label className="block text-sm font-medium mb-1">希望出荷日 <span className="text-red-500">*</span></label>
+<<<<<<< HEAD
           <input type="date" required className="input"
+=======
+          <input type="date" required className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.desired_ship_date} onChange={e => set('desired_ship_date', e.target.value)} />
         </div>
 
@@ -91,9 +95,15 @@ export default function OrderForm() {
         <div>
           <label className="block text-sm font-medium mb-1">出荷先 <span className="text-red-500">*</span></label>
           <input type="text" placeholder="出荷先名・IDで検索..."
+<<<<<<< HEAD
             className="input" style={{ marginBottom:"8px" }}
             value={search} onChange={e => setSearch(e.target.value)} />
           <select required className="input"
+=======
+            className="border rounded-lg px-3 py-2 w-full mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={search} onChange={e => setSearch(e.target.value)} />
+          <select required className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.customer_id} onChange={e => set('customer_id', e.target.value)}>
             <option value="">選択してください</option>
             {filteredCustomers.map(c => (
@@ -105,7 +115,11 @@ export default function OrderForm() {
         {/* 製品名（グループ選択） */}
         <div>
           <label className="block text-sm font-medium mb-1">製品名 / 製造種類 <span className="text-red-500">*</span></label>
+<<<<<<< HEAD
           <select required className="input"
+=======
+          <select required className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.product_id} onChange={e => set('product_id', e.target.value)}>
             <option value="">選択してください</option>
             {Object.entries(productGroups).map(([name, prods]) => (
@@ -121,7 +135,11 @@ export default function OrderForm() {
         {/* 受注数 */}
         <div>
           <label className="block text-sm font-medium mb-1">受注数（c/s） <span className="text-red-500">*</span></label>
+<<<<<<< HEAD
           <input type="number" required min="1" className="input"
+=======
+          <input type="number" required min="1" className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.quantity} onChange={e => set('quantity', e.target.value)} />
           {selectedProduct && form.quantity && (
             <p className="text-xs text-gray-500 mt-1">
@@ -134,7 +152,11 @@ export default function OrderForm() {
         {/* 備考 */}
         <div>
           <label className="block text-sm font-medium mb-1">備考</label>
+<<<<<<< HEAD
           <textarea rows={2} className="input"
+=======
+          <textarea rows={2} className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+>>>>>>> e1816c8d6a634c21dc9fa4dcc24eac886aaabbe0
             value={form.notes} onChange={e => set('notes', e.target.value)} />
         </div>
 
