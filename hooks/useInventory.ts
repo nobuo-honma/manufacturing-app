@@ -40,6 +40,27 @@ export function useProductStocks() {
   return { stocks, loading, refresh: fetch }
 }
 
+// 在庫ページ用統合フック
+export function useInventory(tab: string) {
+  const [itemStocks, setItemStocks]       = useState<ItemStock[]>([])
+  const [productStocks, setProductStocks] = useState<ProductStock[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const refetch = async () => {
+    setLoading(true)
+    const [{ data: items }, { data: products }] = await Promise.all([
+      supabase.from('item_stocks').select('*, items(*)'),
+      supabase.from('product_stocks').select('*, products(*)').order('expiry_date', { ascending: true }),
+    ])
+    setItemStocks(items ?? [])
+    setProductStocks(products ?? [])
+    setLoading(false)
+  }
+
+  useEffect(() => { refetch() }, [tab])
+  return { itemStocks, productStocks, loading, refetch }
+}
+
 // アラート対象（安全在庫割れ）の品目を返す
 export function useStockAlerts() {
   const [alerts, setAlerts]   = useState<ItemStock[]>([])

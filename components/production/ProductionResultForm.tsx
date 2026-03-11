@@ -70,19 +70,19 @@ export default function ProductionResultForm({ plan, onSaved }: Props) {
       <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-gray-500 mb-1">実績個数</label>
-          <input type="number" min="0" required className="border rounded-lg px-3 py-2 w-full text-sm"
+          <input type="number" min="0" required className="input"
             value={form.actual_units}
             onChange={e => setForm(p => ({ ...p, actual_units: Number(e.target.value) }))} />
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">実績c/s</label>
-          <input type="number" min="0" required className="border rounded-lg px-3 py-2 w-full text-sm"
+          <input type="number" min="0" required className="input"
             value={form.actual_cs}
             onChange={e => setForm(p => ({ ...p, actual_cs: Number(e.target.value) }))} />
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">端数(p)</label>
-          <input type="number" min="0" className="border rounded-lg px-3 py-2 w-full text-sm"
+          <input type="number" min="0" className="input"
             value={form.actual_piece}
             onChange={e => setForm(p => ({ ...p, actual_piece: Number(e.target.value) }))} />
         </div>
@@ -90,7 +90,7 @@ export default function ProductionResultForm({ plan, onSaved }: Props) {
 
       <div>
         <label className="block text-xs text-gray-500 mb-1">備考</label>
-        <input type="text" className="border rounded-lg px-3 py-2 w-full text-sm"
+        <input type="text" className="input"
           value={form.notes}
           onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
       </div>

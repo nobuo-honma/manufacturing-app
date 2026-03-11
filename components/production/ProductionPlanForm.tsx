@@ -2,30 +2,21 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Order, Product } from '@/lib/types'
-import { generateLotCode, calcExpiryDate, calcProductionCounts, fmtDate } from '@/lib/utils'
-import { Plus, Trash2 } from 'lucide-react'
+import { generateLotCode, calcExpiryDate, calcProductionCounts } from '@/lib/utils'
+import { Plus, Trash2, CheckCircle } from 'lucide-react'
 
 const MAX_DAYS = 8
 
 interface DayPlan {
-  date: string
-  kg: number
-  units: number
-  cs: number
-  piece: number
-  lot_code: string
-  expiry: string
-  notes: string
+  date: string; kg: number; units: number; cs: number
+  piece: number; lot_code: string; expiry: string; notes: string
 }
-
-const emptyDay = (): DayPlan => ({
-  date:'', kg:0, units:0, cs:0, piece:0, lot_code:'', expiry:'', notes:''
-})
+const emptyDay = (): DayPlan => ({ date:'', kg:0, units:0, cs:0, piece:0, lot_code:'', expiry:'', notes:'' })
 
 interface Props {
   order: Order
-  existingCs?: number  // 既登録のc/s合計
-  comboSeqStart?: number  // MA/FDの連番開始値
+  existingCs?: number
+  comboSeqStart?: number
 }
 
 export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStart = 1 }: Props) {
@@ -37,25 +28,20 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
   useEffect(() => {
     supabase.from('products').select('*').eq('id', order.product_id).single()
       .then(({ data }) => setProduct(data))
-  }, [order.product_id])
+    setDayPlans([emptyDay()])
+    setSaved(false)
+  }, [order.product_id, order.id])
 
   const update = (idx: number, field: Partial<DayPlan>) => {
     setDayPlans(prev => {
       const next = [...prev]
       next[idx] = { ...next[idx], ...field }
-
-      // kg or date が変わったら自動計算
       const d = next[idx]
       if (d.kg > 0 && d.date && product) {
         const { units, cs, piece } = calcProductionCounts(d.kg, product.unit_per_kg, product.unit_per_cs)
-        const dt    = new Date(d.date)
-        const expiry  = calcExpiryDate(dt).toISOString().slice(0, 10)
-        const lot_code = generateLotCode({
-          date: dt,
-          productId: order.product_id,
-          seqInDay: idx,
-          comboSeq: comboSeqStart + idx,
-        })
+        const dt = new Date(d.date)
+        const expiry   = calcExpiryDate(dt).toISOString().slice(0, 10)
+        const lot_code = generateLotCode({ date: dt, productId: order.product_id, seqInDay: idx, comboSeq: comboSeqStart + idx })
         next[idx] = { ...d, ...field, units, cs, piece, expiry, lot_code }
       }
       return next
@@ -83,97 +69,130 @@ export default function ProductionPlanForm({ order, existingCs = 0, comboSeqStar
         notes:           day.notes || null,
       })
     }
-    // 受注ステータスを製造中に更新
     await supabase.from('orders').update({ status: 'in_production' }).eq('id', order.id)
     setSaving(false)
     setSaved(true)
   }
 
   return (
-    <div className="space-y-5">
-      {/* サマリ */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 grid grid-cols-3 gap-4 text-sm">
-        <div>
-          <p className="text-xs text-gray-500">受注数</p>
-          <p className="font-bold text-gray-900">{order.quantity} c/s</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500">今回登録合計</p>
-          <p className="font-bold text-blue-700">{totalCs} c/s</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500">残り必要製造量</p>
-          <p className={`font-bold ${remainCs < 0 ? 'text-red-600' : remainCs === 0 ? 'text-green-600' : 'text-gray-900'}`}>
-            {remainCs} c/s
-          </p>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+
+      {/* サマリバー */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px'
+      }}>
+        {[
+          { label: '受注数',        val: `${order.quantity} c/s`,   color: 'var(--text-primary)' },
+          { label: '今回登録合計',  val: `${totalCs} c/s`,          color: 'var(--accent)' },
+          { label: '残り必要量',    val: `${remainCs} c/s`,
+            color: remainCs < 0 ? 'var(--danger)' : remainCs === 0 ? 'var(--ok)' : 'var(--text-primary)' },
+        ].map(({ label, val, color }) => (
+          <div key={label} className="card-inner" style={{ padding: '12px 16px' }}>
+            <p style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{label}</p>
+            <p style={{ fontSize: '1.0625rem', fontWeight: 700, color }}>{val}</p>
+          </div>
+        ))}
       </div>
 
+      {/* 登録成功メッセージ */}
       {saved && (
-        <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm">
-          ✅ 製造計画を登録しました
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          background: 'var(--ok-bg)', border: '1px solid rgba(52,211,153,0.3)',
+          borderRadius: '10px', padding: '12px 16px',
+          color: 'var(--ok)', fontSize: '0.875rem', fontWeight: 600
+        }}>
+          <CheckCircle size={16} />
+          製造計画を登録しました
         </div>
       )}
 
       {/* 日程入力 */}
       {dayPlans.map((day, idx) => (
-        <div key={idx} className="border border-gray-200 rounded-xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-gray-700">製造予定日 {idx + 1}日目</h4>
+        <div key={idx} className="card-inner" style={{ padding: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)' }}>
+              {idx + 1}日目
+            </span>
             {dayPlans.length > 1 && (
               <button onClick={() => setDayPlans(p => p.filter((_, i) => i !== idx))}
-                className="text-gray-400 hover:text-red-500">
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px' }}
+                onMouseOver={e => (e.currentTarget.style.color = 'var(--danger)')}
+                onMouseOut={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
                 <Trash2 size={15} />
               </button>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">製造予定日</label>
-              <input type="date" className="border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={day.date}
-                onChange={e => update(idx, { date: e.target.value })} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="label">製造予定日</label>
+              <input type="date" className="input"
+                value={day.date} onChange={e => update(idx, { date: e.target.value })} />
             </div>
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">製造量（kg）</label>
-              <input type="number" min="0" step="0.5"
-                className="border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="label">製造量（kg）</label>
+              <input type="number" min="0" step="0.5" className="input"
                 value={day.kg || ''}
                 onChange={e => update(idx, { kg: Number(e.target.value) })} />
             </div>
           </div>
 
+          {/* 自動計算結果 */}
           {day.kg > 0 && day.date && (
-            <div className="bg-gray-50 rounded-lg p-3 grid grid-cols-5 gap-2 text-xs">
-              <div><span className="text-gray-500">個数</span><br /><strong>{day.units}</strong></div>
-              <div><span className="text-gray-500">c/s</span><br /><strong>{day.cs}</strong></div>
-              <div><span className="text-gray-500">端数(p)</span><br /><strong>{day.piece}</strong></div>
-              <div><span className="text-gray-500">賞味期限</span><br /><strong>{day.expiry}</strong></div>
-              <div><span className="text-gray-500">Lot番号</span><br /><strong className="font-mono">{day.lot_code}</strong></div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '8px',
+              marginTop: '12px', padding: '12px 14px',
+              background: 'rgba(56,189,248,0.05)',
+              border: '1px solid rgba(56,189,248,0.15)',
+              borderRadius: '10px',
+            }}>
+              {[
+                { label: '個数',     val: `${day.units}` },
+                { label: 'c/s',      val: `${day.cs}` },
+                { label: '端数(p)',  val: `${day.piece}` },
+                { label: '賞味期限', val: day.expiry },
+                { label: 'Lot番号',  val: day.lot_code, mono: true },
+              ].map(({ label, val, mono }) => (
+                <div key={label} style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '3px' }}>{label}</p>
+                  <p style={{
+                    fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)',
+                    fontFamily: mono ? 'DM Mono, monospace' : undefined
+                  }}>{val}</p>
+                </div>
+              ))}
             </div>
           )}
 
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">備考</label>
-            <input type="text" placeholder="例: 50kg×4回"
-              className="border rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={day.notes}
-              onChange={e => update(idx, { notes: e.target.value })} />
+          <div className="form-group" style={{ marginTop: '14px', marginBottom: 0 }}>
+            <label className="label">備考</label>
+            <input type="text" placeholder="例: 50kg×4回" className="input"
+              value={day.notes} onChange={e => update(idx, { notes: e.target.value })} />
           </div>
         </div>
       ))}
 
+      {/* 日程追加ボタン */}
       {dayPlans.length < MAX_DAYS && (
         <button onClick={() => setDayPlans(p => [...p, emptyDay()])}
-          className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center gap-2">
-          <Plus size={16} />
+          style={{
+            width: '100%', padding: '12px',
+            border: '2px dashed rgba(56,189,248,0.25)', borderRadius: '10px',
+            background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)',
+            fontSize: '0.8125rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+            transition: 'all 0.15s',
+          }}
+          onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
+          onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(56,189,248,0.25)'; e.currentTarget.style.color = 'var(--text-muted)' }}>
+          <Plus size={15} />
           製造予定日を追加（最大{MAX_DAYS}日）
         </button>
       )}
 
-      <button onClick={handleSubmit} disabled={saving}
-        className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50">
+      {/* 登録ボタン */}
+      <button onClick={handleSubmit} disabled={saving} className="btn-submit"
+        style={{ width: '100%', marginTop: '4px' }}>
         {saving ? '登録中...' : '製造計画を登録する'}
       </button>
     </div>

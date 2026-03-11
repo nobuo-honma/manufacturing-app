@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { Item } from '@/lib/types'
 import { generateArrivalId } from '@/lib/utils'
 
-export default function ArrivalForm({ onSaved }: { onSaved: () => void }) {
+export default function ArrivalForm({ onSaved, onCancel }: { onSaved: () => void; onCancel?: () => void }) {
   const [items, setItems]   = useState<Item[]>([])
   const [search, setSearch] = useState('')
   const [form, setForm]     = useState({
@@ -47,49 +47,57 @@ export default function ArrivalForm({ onSaved }: { onSaved: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-      <div>
-        <label className="text-sm font-medium block mb-1">品目検索</label>
-        <input type="text" placeholder="品目名・IDで検索..."
-          className="border rounded-lg px-3 py-2 w-full mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={search} onChange={e => setSearch(e.target.value)} />
-        <select required className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={form.item_id} onChange={e => set('item_id', e.target.value)}>
-          <option value="">選択してください</option>
-          {filtered.map(i => (
-            <option key={i.id} value={i.id}>
-              {i.id} {i.name}（{i.item_type === 'raw_material' ? '原材料' : '資材'}）
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="form-card" style={{ maxWidth: '560px' }}>
+      <div className="form-card-header">入荷予定の登録</div>
 
-      <div>
-        <label className="text-sm font-medium block mb-1">入荷予定日 <span className="text-red-500">*</span></label>
-        <input type="date" required className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={form.expected_date} onChange={e => set('expected_date', e.target.value)} />
-      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="label">品目検索</label>
+          <input type="text" placeholder="品目名・IDで検索..."
+            className="input" style={{ marginBottom: '8px' }}
+            value={search} onChange={e => setSearch(e.target.value)} />
+          <select required className="input"
+            value={form.item_id} onChange={e => set('item_id', e.target.value)}>
+            <option value="">選択してください</option>
+            {filtered.map(i => (
+              <option key={i.id} value={i.id}>
+                {i.id} {i.name}（{i.item_type === 'raw_material' ? '原材料' : '資材'}）
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <label className="text-sm font-medium block mb-1">
-          入荷予定数 {selected && <span className="text-gray-400 font-normal">（{selected.unit}）</span>}
-          <span className="text-red-500"> *</span>
-        </label>
-        <input type="number" required min="0" step="0.001"
-          className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={form.quantity} onChange={e => set('quantity', e.target.value)} />
-      </div>
+        <div className="form-group">
+          <label className="label">入荷予定日</label>
+          <input type="date" required className="input"
+            value={form.expected_date} onChange={e => set('expected_date', e.target.value)} />
+        </div>
 
-      <div>
-        <label className="text-sm font-medium block mb-1">備考</label>
-        <input type="text" className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={form.notes} onChange={e => set('notes', e.target.value)} />
-      </div>
+        <div className="form-group">
+          <label className="label">
+            入荷予定数{selected && <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>（{selected.unit}）</span>}
+          </label>
+          <input type="number" required min="0" step="0.001" className="input"
+            value={form.quantity} onChange={e => set('quantity', e.target.value)} />
+        </div>
 
-      <button type="submit" disabled={saving}
-        className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 w-full font-medium disabled:opacity-50">
-        {saving ? '登録中...' : '入荷予定を登録する'}
-      </button>
-    </form>
+        <div className="form-group">
+          <label className="label">備考</label>
+          <input type="text" className="input"
+            value={form.notes} onChange={e => set('notes', e.target.value)} />
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '8px' }}>
+          <button type="submit" disabled={saving} className="btn-submit">
+            {saving ? '登録中...' : '登録する'}
+          </button>
+          {onCancel && (
+            <button type="button" onClick={onCancel} className="btn-secondary" style={{ borderRadius: '999px', padding: '13px 28px' }}>
+              キャンセル
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
   )
 }

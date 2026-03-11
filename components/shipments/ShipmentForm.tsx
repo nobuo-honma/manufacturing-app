@@ -61,8 +61,8 @@ export default function ShipmentForm({ order, onSaved }: { order: Order; onSaved
       </div>
 
       <div>
-        <label className="text-sm font-medium block mb-1">出荷日 <span className="text-red-500">*</span></label>
-        <input type="date" required className="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <label className="label">出荷日 <span className="text-red-500">*</span></label>
+        <input type="date" required className="input"
           value={shipDate} onChange={e => setShipDate(e.target.value)} />
       </div>
 
@@ -71,7 +71,7 @@ export default function ShipmentForm({ order, onSaved }: { order: Order; onSaved
         {lotRows.map((row, idx) => (
           <div key={idx} className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
             <span className="text-xs text-gray-400 w-4">{idx+1}</span>
-            <select className="border rounded-lg px-2 py-1.5 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <select className="input" style={{ borderRadius:"999px" }}
               value={row.lot_code} onChange={e => updateRow(idx, { lot_code: e.target.value })}>
               <option value="">Lot選択</option>
               {availLots.map(l => (
@@ -81,11 +81,11 @@ export default function ShipmentForm({ order, onSaved }: { order: Order; onSaved
               ))}
             </select>
             <input type="number" min="0" placeholder="c/s"
-              className="border rounded-lg px-2 py-1.5 text-sm w-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input" style={{ width:"80px" }}
               value={row.qty_cs || ''} onChange={e => updateRow(idx, { qty_cs: Number(e.target.value) })} />
             <span className="text-xs text-gray-400">c/s</span>
             <input type="number" min="0" placeholder="p"
-              className="border rounded-lg px-2 py-1.5 text-sm w-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input" style={{ width:"64px" }}
               value={row.qty_piece || ''} onChange={e => updateRow(idx, { qty_piece: Number(e.target.value) })} />
             <span className="text-xs text-gray-400">p</span>
             {lotRows.length > 1 && (

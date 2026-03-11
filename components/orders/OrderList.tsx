@@ -13,7 +13,7 @@ const STATUS_STYLE: Record<string, string> = {
 
 export default function OrderList() {
   const [filterStatus, setFilterStatus] = useState<OrderStatus | 'all'>('all')
-  const { orders, loading } = useOrders(filterStatus)
+  const { orders, loading } = useOrders(filterStatus === 'all' ? undefined : filterStatus)
 
   const tabs = [
     { value: 'all',           label: 'すべて' },

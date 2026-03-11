@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Order, ProductionPlan } from '@/lib/types'
 import ProductionPlanForm from '@/components/production/ProductionPlanForm'
@@ -8,21 +9,22 @@ import Link from 'next/link'
 import { fmtDate } from '@/lib/utils'
 import { PLAN_STATUS_LABEL } from '@/lib/types'
 
-export default function ProductionDetailPage({ params }: { params: { orderId: string } }) {
+export default function ProductionDetailPage() {
+  const { orderId } = useParams<{ orderId: string }>()
   const [order, setOrder]   = useState<Order | null>(null)
   const [plans, setPlans]   = useState<ProductionPlan[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
-      supabase.from('orders').select('*, customers(*), products(*)').eq('id', params.orderId).single(),
-      supabase.from('production_plans').select('*, products(*)').eq('order_id', params.orderId).order('production_date'),
+      supabase.from('orders').select('*, customers(*), products(*)').eq('id', orderId).single(),
+      supabase.from('production_plans').select('*, products(*)').eq('order_id', orderId).order('production_date'),
     ]).then(([{ data: o }, { data: p }]) => {
       setOrder(o)
       setPlans(p ?? [])
       setLoading(false)
     })
-  }, [params.orderId])
+  }, [orderId])
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 rounded-xl" />
   if (!order)  return <p className="text-red-500">受注が見つかりません</p>

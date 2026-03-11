@@ -151,38 +151,111 @@
     color: var(--text-primary);
   }
 
-  /* インプット */
-  .input {
-    background: var(--surface-2);
-    border: 1px solid var(--border-bright);
-    border-radius: 8px;
-    padding: 8px 12px;
+  /* ラベル */
+  .label {
+    display: block;
     font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  /* フォームグループ */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  /* インプット — 画像スタイル（大きめ角丸・アクセントボーダー） */
+  .input {
+    background: rgba(15, 29, 53, 0.6);
+    border: 1.5px solid rgba(56, 189, 248, 0.25);
+    border-radius: 999px;
+    padding: 13px 22px;
+    font-size: 0.9375rem;
     color: var(--text-primary);
     outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     width: 100%;
     font-family: 'Noto Sans JP', sans-serif;
   }
   .input:focus {
     border-color: var(--accent);
+    background: rgba(56, 189, 248, 0.05);
     box-shadow: 0 0 0 3px var(--accent-glow);
   }
   .input::placeholder { color: var(--text-muted); }
 
+  /* テキストエリアだけ角丸を小さく */
+  textarea.input {
+    border-radius: 18px;
+    padding: 14px 22px;
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  /* セレクトボックス */
+  select.input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238fa8cc' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 44px;
+  }
   select.input option {
     background: var(--navy-850);
     color: var(--text-primary);
+    border-radius: 0;
   }
 
-  /* ラベル */
-  .label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
+  /* フォームカード（入力フォーム全体を囲むカード） */
+  .form-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+  }
+
+  /* フォームヘッダー（画像の緑タイトル部分） */
+  .form-card-header {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 8px;
+    margin-bottom: 28px;
     letter-spacing: 0.02em;
+  }
+
+  /* 送信ボタン（画像スタイル） */
+  .btn-submit {
+    display: block;
+    margin: 8px auto 0;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 13px 56px;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border: 1.5px solid rgba(56, 189, 248, 0.35);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .btn-submit:hover {
+    background: var(--accent-dim);
+    color: #fff;
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* ページタイトル */

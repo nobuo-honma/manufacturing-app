@@ -72,7 +72,7 @@ export function calcProductionCounts(
 
 // ===== ID採番 =====
 export function generateOrderId(date: Date, seq: number): string {
-  return `ORD-${date.toISOString().slice(0,10).replace(/-/g,'')-}-${String(seq).padStart(3,'0')}`
+  return `ORD-${date.toISOString().slice(0,10).replace(/-/g,'')}-${String(seq).padStart(3,'0')}`
 }
 export function generateArrivalId(date: Date, seq: number): string {
   return `INC-${date.toISOString().slice(0,10).replace(/-/g,'')}-${String(seq).padStart(3,'0')}`
@@ -83,6 +83,35 @@ export function getStockStatus(stock: number, safety: number): '充足' | '注�
   if (stock < safety)        return '不足'
   if (stock < safety * 1.5)  return '注意'
   return '充足'
+}
+
+// ===== ステータスラベル・カラー =====
+export const ORDER_STATUS_LABEL: Record<string, string> = {
+  ordered:      '受注済',
+  in_production:'製造中',
+  shipped:      '出荷済',
+  cancelled:    'キャンセル',
+}
+export const ORDER_STATUS_COLOR: Record<string, string> = {
+  ordered:       'badge-blue',
+  in_production: 'badge-warn',
+  shipped:       'badge-ok',
+  cancelled:     'badge-gray',
+}
+export const ARRIVAL_STATUS_LABEL: Record<string, string> = {
+  scheduled: '入荷予定',
+  arrived:   '入荷済',
+  cancelled: 'キャンセル',
+}
+export const SHIPMENT_STATUS_LABEL: Record<string, string> = {
+  pending:   '出荷待ち',
+  shipped:   '出荷済',
+  cancelled: 'キャンセル',
+}
+export const STATUS_COLOR: Record<string, string> = {
+  '充足': 'badge-ok',
+  '注意': 'badge-warn',
+  '不足': 'badge-danger',
 }
 
 // ===== 日付フォーマット =====
